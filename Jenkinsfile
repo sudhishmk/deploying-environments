@@ -59,5 +59,20 @@ pipeline {
                 """
             }
         }
+        stage('Deploy - Production') {
+            environment {
+                APP_NAMESPACE = "shopping-cart-production"
+                QUAY = credentials('QUAY_USER')
+            }
+            input{ message 'Deploy to Production?'}
+            steps {
+                sh """
+                    oc set image \
+                    deployment ${DEPLOYMENT_STAGE} \
+                    shopping-cart-stage=quay.io/${QUAY_USR}/deploying-environments:build-${BUILD_NUMBER} \
+                    -n ${APP_NAMESPACE} --record
+                """
+            }
+        }        
     }
 }
